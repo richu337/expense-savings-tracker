@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense & Savings Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Expense & Savings Tracker</h1>
+            <p class="subtitle">Take control of your finances</p>
+        </header>
+
+        <!-- Financial Overview Dashboard -->
+        <div class="dashboard">
+            <div class="card balance-card">
+                <h3>Total Balance</h3>
+                <p class="amount" id="totalBalance">$0.00</p>
+            </div>
+            <div class="card expense-card">
+                <h3>Total Expenses</h3>
+                <p class="amount" id="totalExpenses">$0.00</p>
+            </div>
+            <div class="card savings-card">
+                <h3>Total Savings</h3>
+                <p class="amount" id="totalSavings">$0.00</p>
+            </div>
+            <div class="card net-card">
+                <h3>Net Balance</h3>
+                <p class="amount" id="netBalance">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('expenses')">Expenses</button>
+            <button class="tab-btn" onclick="showTab('savings')">Savings</button>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div id="expensesTab" class="tab-content active">
+            <div class="form-section">
+                <h2>Add New Expense</h2>
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="expenseDescription">Description</label>
+                        <input type="text" id="expenseDescription" placeholder="e.g., Groceries" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount ($)</label>
+                        <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Category</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Food">🍔 Food</option>
+                            <option value="Transport">🚗 Transport</option>
+                            <option value="Shopping">🛍️ Shopping</option>
+                            <option value="Bills">💡 Bills</option>
+                            <option value="Entertainment">🎬 Entertainment</option>
+                            <option value="Health">🏥 Health</option>
+                            <option value="Other">📦 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDate">Date</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h2>Recent Expenses</h2>
+                <div id="expensesList" class="items-list"></div>
+            </div>
+        </div>
+
+        <!-- Savings Tab -->
+        <div id="savingsTab" class="tab-content">
+            <div class="form-section">
+                <h2>Add Savings Goal</h2>
+                <form id="savingsForm">
+                    <div class="form-group">
+                        <label for="savingsGoal">Goal Name</label>
+                        <input type="text" id="savingsGoal" placeholder="e.g., Emergency Fund" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsTarget">Target Amount ($)</label>
+                        <input type="number" id="savingsTarget" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsAmount">Current Amount ($)</label>
+                        <input type="number" id="savingsAmount" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Savings Goal</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h2>Savings Goals</h2>
+                <div id="savingsList" class="items-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
