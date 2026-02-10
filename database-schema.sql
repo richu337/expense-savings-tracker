@@ -11,12 +11,12 @@ CREATE TABLE expenses (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create savings table
+-- Create savings table (simplified - just track savings amounts)
 CREATE TABLE savings (
     id BIGSERIAL PRIMARY KEY,
-    goal_name TEXT NOT NULL,
-    target_amount DECIMAL(10, 2) NOT NULL,
-    current_amount DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    description TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -35,14 +35,13 @@ CREATE POLICY "Enable all access for savings" ON savings
 -- Optional: Create indexes for better performance
 CREATE INDEX idx_expenses_date ON expenses(date DESC);
 CREATE INDEX idx_expenses_category ON expenses(category);
-CREATE INDEX idx_savings_created_at ON savings(created_at DESC);
+CREATE INDEX idx_savings_date ON savings(date DESC);
 
 -- Optional: Add comments for documentation
 COMMENT ON TABLE expenses IS 'Stores user expense records';
-COMMENT ON TABLE savings IS 'Stores user savings goals and progress';
+COMMENT ON TABLE savings IS 'Stores user savings entries';
 COMMENT ON COLUMN expenses.description IS 'Description of the expense';
 COMMENT ON COLUMN expenses.amount IS 'Amount spent';
 COMMENT ON COLUMN expenses.category IS 'Category of expense (Food, Transport, etc.)';
-COMMENT ON COLUMN savings.goal_name IS 'Name of the savings goal';
-COMMENT ON COLUMN savings.target_amount IS 'Target amount to save';
-COMMENT ON COLUMN savings.current_amount IS 'Current saved amount';
+COMMENT ON COLUMN savings.description IS 'Description of the savings entry';
+COMMENT ON COLUMN savings.amount IS 'Amount saved';
