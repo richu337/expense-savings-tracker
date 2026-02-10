@@ -36,6 +36,55 @@ header h1 {
     font-size: 1.1rem;
 }
 
+/* Income Section */
+.income-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.income-input label {
+    display: block;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.income-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.income-controls input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid white;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+}
+
+.income-controls input:focus {
+    outline: none;
+    border-color: #43e97b;
+}
+
+.btn-income {
+    background: white;
+    color: #667eea;
+    padding: 12px 25px;
+    font-weight: 600;
+}
+
+.btn-income:hover {
+    background: #43e97b;
+    color: white;
+}
+
 /* Dashboard Cards */
 .dashboard {
     display: grid;
@@ -294,6 +343,15 @@ header h1 {
 
     .dashboard {
         grid-template-columns: 1fr;
+    }
+
+    .income-controls {
+        flex-direction: column;
+    }
+
+    .income-controls input,
+    .btn-income {
+        width: 100%;
     }
 
     .item {
