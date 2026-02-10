@@ -1,0 +1,240 @@
+// Set today's date as default
+document.getElementById('expenseDate').valueAsDate = new Date();
+
+// Tab switching
+function showTab(tabName) {
+    const tabs = document.querySelectorAll('.tab-content');
+    const buttons = document.querySelectorAll('.tab-btn');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    event.target.classList.add('active');
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadExpenses();
+    loadSavings();
+    updateDashboard();
+});
+
+// Expense Form Submit
+document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const expense = {
+        description: document.getElementById('expenseDescription').value,
+        amount: parseFloat(document.getElementById('expenseAmount').value),
+        category: document.getElementById('expenseCategory').value,
+        date: document.getElementById('expenseDate').value,
+        created_at: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+        .from('expenses')
+        .insert([expense]);
+    
+    if (error) {
+        console.error('Error adding expense:', error);
+        alert('Error adding expense. Please try again.');
+    } else {
+        alert('Expense added successfully!');
+        e.target.reset();
+        document.getElementById('expenseDate').valueAsDate = new Date();
+        loadExpenses();
+        updateDashboard();
+    }
+});
+
+// Savings Form Submit
+document.getElementById('savingsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const savings = {
+        goal_name: document.getElementById('savingsGoal').value,
+        target_amount: parseFloat(document.getElementById('savingsTarget').value),
+        current_amount: parseFloat(document.getElementById('savingsAmount').value),
+        created_at: new Date().toISOString()
+    };
+    
+    const { data, error } = await supabase
+        .from('savings')
+        .insert([savings]);
+    
+    if (error) {
+        console.error('Error adding savings goal:', error);
+        alert('Error adding savings goal. Please try again.');
+    } else {
+        alert('Savings goal added successfully!');
+        e.target.reset();
+        loadSavings();
+        updateDashboard();
+    }
+});
+
+// Load Expenses
+async function loadExpenses() {
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .order('date', { ascending: false });
+    
+    if (error) {
+        console.error('Error loading expenses:', error);
+        return;
+    }
+    
+    const expensesList = document.getElementById('expensesList');
+    
+    if (data.length === 0) {
+        expensesList.innerHTML = '<div class="empty-state"><p>No expenses yet. Add your first expense!</p></div>';
+        return;
+    }
+    
+    expensesList.innerHTML = data.map(expense => `
+        <div class="item">
+            <div class="item-info">
+                <h4>${expense.category} - ${expense.description}</h4>
+                <p>${new Date(expense.date).toLocaleDateString()}</p>
+            </div>
+            <div class="item-amount">$${expense.amount.toFixed(2)}</div>
+            <div class="item-actions">
+                <button class="btn btn-danger" onclick="deleteExpense(${expense.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Load Savings
+async function loadSavings() {
+    const { data, error } = await supabase
+        .from('savings')
+        .select('*')
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error('Error loading savings:', error);
+        return;
+    }
+    
+    const savingsList = document.getElementById('savingsList');
+    
+    if (data.length === 0) {
+        savingsList.innerHTML = '<div class="empty-state"><p>No savings goals yet. Create your first goal!</p></div>';
+        return;
+    }
+    
+    savingsList.innerHTML = data.map(saving => {
+        const progress = (saving.current_amount / saving.target_amount) * 100;
+        const remaining = saving.target_amount - saving.current_amount;
+        
+        return `
+            <div class="item savings-item">
+                <div class="savings-header">
+                    <div class="item-info">
+                        <h4>${saving.goal_name}</h4>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-update" onclick="updateSavings(${saving.id})">Update</button>
+                        <button class="btn btn-danger" onclick="deleteSavings(${saving.id})">Delete</button>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${Math.min(progress, 100)}%">
+                        ${progress.toFixed(1)}%
+                    </div>
+                </div>
+                <div class="savings-stats">
+                    <span>Current: $${saving.current_amount.toFixed(2)}</span>
+                    <span>Target: $${saving.target_amount.toFixed(2)}</span>
+                    <span>Remaining: $${remaining.toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Update Dashboard
+async function updateDashboard() {
+    // Get total expenses
+    const { data: expenses } = await supabase
+        .from('expenses')
+        .select('amount');
+    
+    const totalExpenses = expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
+    
+    // Get total savings
+    const { data: savings } = await supabase
+        .from('savings')
+        .select('current_amount');
+    
+    const totalSavings = savings?.reduce((sum, sav) => sum + sav.current_amount, 0) || 0;
+    
+    // Calculate balances (assuming starting balance or income)
+    // You can modify this to include an income table
+    const totalBalance = 10000; // Example starting balance
+    const netBalance = totalBalance - totalExpenses - totalSavings;
+    
+    // Update dashboard
+    document.getElementById('totalBalance').textContent = `$${totalBalance.toFixed(2)}`;
+    document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
+    document.getElementById('totalSavings').textContent = `$${totalSavings.toFixed(2)}`;
+    document.getElementById('netBalance').textContent = `$${netBalance.toFixed(2)}`;
+}
+
+// Delete Expense
+async function deleteExpense(id) {
+    if (!confirm('Are you sure you want to delete this expense?')) return;
+    
+    const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', id);
+    
+    if (error) {
+        console.error('Error deleting expense:', error);
+        alert('Error deleting expense. Please try again.');
+    } else {
+        loadExpenses();
+        updateDashboard();
+    }
+}
+
+// Delete Savings
+async function deleteSavings(id) {
+    if (!confirm('Are you sure you want to delete this savings goal?')) return;
+    
+    const { error } = await supabase
+        .from('savings')
+        .delete()
+        .eq('id', id);
+    
+    if (error) {
+        console.error('Error deleting savings goal:', error);
+        alert('Error deleting savings goal. Please try again.');
+    } else {
+        loadSavings();
+        updateDashboard();
+    }
+}
+
+// Update Savings
+async function updateSavings(id) {
+    const newAmount = prompt('Enter new current amount:');
+    if (!newAmount) return;
+    
+    const { error } = await supabase
+        .from('savings')
+        .update({ current_amount: parseFloat(newAmount) })
+        .eq('id', id);
+    
+    if (error) {
+        console.error('Error updating savings:', error);
+        alert('Error updating savings. Please try again.');
+    } else {
+        loadSavings();
+        updateDashboard();
+    }
+}
