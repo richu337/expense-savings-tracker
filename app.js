@@ -1,5 +1,6 @@
 // Set today's date as default
 document.getElementById('expenseDate').valueAsDate = new Date();
+document.getElementById('savingsDate').valueAsDate = new Date();
 
 // Tab switching
 function showTab(tabName) {
@@ -53,9 +54,9 @@ document.getElementById('savingsForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const savings = {
-        goal_name: document.getElementById('savingsGoal').value,
-        target_amount: parseFloat(document.getElementById('savingsTarget').value),
-        current_amount: parseFloat(document.getElementById('savingsAmount').value),
+        description: document.getElementById('savingsDescription').value,
+        amount: parseFloat(document.getElementById('savingsAmount').value),
+        date: document.getElementById('savingsDate').value,
         created_at: new Date().toISOString()
     };
     
@@ -64,11 +65,12 @@ document.getElementById('savingsForm').addEventListener('submit', async (e) => {
         .insert([savings]);
     
     if (error) {
-        console.error('Error adding savings goal:', error);
-        alert('Error adding savings goal. Please try again.');
+        console.error('Error adding savings:', error);
+        alert('Error adding savings. Please try again.');
     } else {
-        alert('Savings goal added successfully!');
+        alert('Savings added successfully!');
         e.target.reset();
+        document.getElementById('savingsDate').valueAsDate = new Date();
         loadSavings();
         updateDashboard();
     }
@@ -112,7 +114,7 @@ async function loadSavings() {
     const { data, error } = await supabase
         .from('savings')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
     
     if (error) {
         console.error('Error loading savings:', error);
@@ -122,38 +124,22 @@ async function loadSavings() {
     const savingsList = document.getElementById('savingsList');
     
     if (data.length === 0) {
-        savingsList.innerHTML = '<div class="empty-state"><p>No savings goals yet. Create your first goal!</p></div>';
+        savingsList.innerHTML = '<div class="empty-state"><p>No savings yet. Add your first savings entry!</p></div>';
         return;
     }
     
-    savingsList.innerHTML = data.map(saving => {
-        const progress = (saving.current_amount / saving.target_amount) * 100;
-        const remaining = saving.target_amount - saving.current_amount;
-        
-        return `
-            <div class="item savings-item">
-                <div class="savings-header">
-                    <div class="item-info">
-                        <h4>${saving.goal_name}</h4>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-update" onclick="updateSavings(${saving.id})">Update</button>
-                        <button class="btn btn-danger" onclick="deleteSavings(${saving.id})">Delete</button>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${Math.min(progress, 100)}%">
-                        ${progress.toFixed(1)}%
-                    </div>
-                </div>
-                <div class="savings-stats">
-                    <span>Current: $${saving.current_amount.toFixed(2)}</span>
-                    <span>Target: $${saving.target_amount.toFixed(2)}</span>
-                    <span>Remaining: $${remaining.toFixed(2)}</span>
-                </div>
+    savingsList.innerHTML = data.map(saving => `
+        <div class="item">
+            <div class="item-info">
+                <h4>${saving.description}</h4>
+                <p>${new Date(saving.date).toLocaleDateString()}</p>
             </div>
-        `;
-    }).join('');
+            <div class="item-amount savings-amount">$${saving.amount.toFixed(2)}</div>
+            <div class="item-actions">
+                <button class="btn btn-danger" onclick="deleteSavings(${saving.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 // Update Dashboard
@@ -168,9 +154,9 @@ async function updateDashboard() {
     // Get total savings
     const { data: savings } = await supabase
         .from('savings')
-        .select('current_amount');
+        .select('amount');
     
-    const totalSavings = savings?.reduce((sum, sav) => sum + sav.current_amount, 0) || 0;
+    const totalSavings = savings?.reduce((sum, sav) => sum + sav.amount, 0) || 0;
     
     // Calculate balances (assuming starting balance or income)
     // You can modify this to include an income table
@@ -204,7 +190,7 @@ async function deleteExpense(id) {
 
 // Delete Savings
 async function deleteSavings(id) {
-    if (!confirm('Are you sure you want to delete this savings goal?')) return;
+    if (!confirm('Are you sure you want to delete this savings entry?')) return;
     
     const { error } = await supabase
         .from('savings')
@@ -212,27 +198,8 @@ async function deleteSavings(id) {
         .eq('id', id);
     
     if (error) {
-        console.error('Error deleting savings goal:', error);
-        alert('Error deleting savings goal. Please try again.');
-    } else {
-        loadSavings();
-        updateDashboard();
-    }
-}
-
-// Update Savings
-async function updateSavings(id) {
-    const newAmount = prompt('Enter new current amount:');
-    if (!newAmount) return;
-    
-    const { error } = await supabase
-        .from('savings')
-        .update({ current_amount: parseFloat(newAmount) })
-        .eq('id', id);
-    
-    if (error) {
-        console.error('Error updating savings:', error);
-        alert('Error updating savings. Please try again.');
+        console.error('Error deleting savings:', error);
+        alert('Error deleting savings. Please try again.');
     } else {
         loadSavings();
         updateDashboard();
