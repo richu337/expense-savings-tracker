@@ -16,10 +16,37 @@ function showTab(tabName) {
 
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadIncome();
     loadExpenses();
     loadSavings();
     updateDashboard();
 });
+
+// Update Income
+async function updateIncome() {
+    const incomeInput = document.getElementById('totalIncome');
+    const income = parseFloat(incomeInput.value);
+    
+    if (!income || income <= 0) {
+        alert('Please enter a valid income amount');
+        return;
+    }
+    
+    // Store income in localStorage for simplicity
+    // You can also create an income table in Supabase if needed
+    localStorage.setItem('totalIncome', income);
+    
+    alert('Income updated successfully!');
+    updateDashboard();
+}
+
+// Load Income
+function loadIncome() {
+    const savedIncome = localStorage.getItem('totalIncome');
+    if (savedIncome) {
+        document.getElementById('totalIncome').value = savedIncome;
+    }
+}
 
 // Expense Form Submit
 document.getElementById('expenseForm').addEventListener('submit', async (e) => {
@@ -101,7 +128,7 @@ async function loadExpenses() {
                 <h4>${expense.category} - ${expense.description}</h4>
                 <p>${new Date(expense.date).toLocaleDateString()}</p>
             </div>
-            <div class="item-amount">$${expense.amount.toFixed(2)}</div>
+            <div class="item-amount">₹${expense.amount.toFixed(2)}</div>
             <div class="item-actions">
                 <button class="btn btn-danger" onclick="deleteExpense(${expense.id})">Delete</button>
             </div>
@@ -134,7 +161,7 @@ async function loadSavings() {
                 <h4>${saving.description}</h4>
                 <p>${new Date(saving.date).toLocaleDateString()}</p>
             </div>
-            <div class="item-amount savings-amount">$${saving.amount.toFixed(2)}</div>
+            <div class="item-amount savings-amount">₹${saving.amount.toFixed(2)}</div>
             <div class="item-actions">
                 <button class="btn btn-danger" onclick="deleteSavings(${saving.id})">Delete</button>
             </div>
@@ -144,6 +171,9 @@ async function loadSavings() {
 
 // Update Dashboard
 async function updateDashboard() {
+    // Get total income from localStorage
+    const totalIncome = parseFloat(localStorage.getItem('totalIncome')) || 0;
+    
     // Get total expenses
     const { data: expenses } = await supabaseClient
         .from('expenses')
@@ -158,16 +188,22 @@ async function updateDashboard() {
     
     const totalSavings = savings?.reduce((sum, sav) => sum + sav.amount, 0) || 0;
     
-    // Calculate balances (assuming starting balance or income)
-    // You can modify this to include an income table
-    const totalBalance = 10000; // Example starting balance
-    const netBalance = totalBalance - totalExpenses - totalSavings;
+    // Calculate remaining balance
+    const netBalance = totalIncome - totalExpenses - totalSavings;
     
     // Update dashboard
-    document.getElementById('totalBalance').textContent = `$${totalBalance.toFixed(2)}`;
-    document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
-    document.getElementById('totalSavings').textContent = `$${totalSavings.toFixed(2)}`;
-    document.getElementById('netBalance').textContent = `$${netBalance.toFixed(2)}`;
+    document.getElementById('totalBalance').textContent = `₹${totalIncome.toFixed(2)}`;
+    document.getElementById('totalExpenses').textContent = `₹${totalExpenses.toFixed(2)}`;
+    document.getElementById('totalSavings').textContent = `₹${totalSavings.toFixed(2)}`;
+    document.getElementById('netBalance').textContent = `₹${netBalance.toFixed(2)}`;
+    
+    // Color code the net balance
+    const netBalanceElement = document.getElementById('netBalance');
+    if (netBalance < 0) {
+        netBalanceElement.style.color = '#f5576c';
+    } else {
+        netBalanceElement.style.color = 'white';
+    }
 }
 
 // Delete Expense
