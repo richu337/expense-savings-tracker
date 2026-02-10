@@ -82,26 +82,26 @@
         <!-- Savings Tab -->
         <div id="savingsTab" class="tab-content">
             <div class="form-section">
-                <h2>Add Savings Goal</h2>
+                <h2>Add Savings Entry</h2>
                 <form id="savingsForm">
                     <div class="form-group">
-                        <label for="savingsGoal">Goal Name</label>
-                        <input type="text" id="savingsGoal" placeholder="e.g., Emergency Fund" required>
+                        <label for="savingsDescription">Description</label>
+                        <input type="text" id="savingsDescription" placeholder="e.g., Monthly Savings, Bonus" required>
                     </div>
                     <div class="form-group">
-                        <label for="savingsTarget">Target Amount ($)</label>
-                        <input type="number" id="savingsTarget" step="0.01" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="savingsAmount">Current Amount ($)</label>
+                        <label for="savingsAmount">Amount ($)</label>
                         <input type="number" id="savingsAmount" step="0.01" placeholder="0.00" required>
                     </div>
-                    <button type="submit" class="btn btn-success">Add Savings Goal</button>
+                    <div class="form-group">
+                        <label for="savingsDate">Date</label>
+                        <input type="date" id="savingsDate" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Savings</button>
                 </form>
             </div>
 
             <div class="list-section">
-                <h2>Savings Goals</h2>
+                <h2>Savings History</h2>
                 <div id="savingsList" class="items-list"></div>
             </div>
         </div>
