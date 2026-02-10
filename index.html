@@ -13,23 +13,34 @@
             <p class="subtitle">Take control of your finances</p>
         </header>
 
+        <!-- Income Section -->
+        <div class="income-section">
+            <div class="income-input">
+                <label for="totalIncome">Set Your Total Income/Balance:</label>
+                <div class="income-controls">
+                    <input type="number" id="totalIncome" step="0.01" placeholder="Enter your total income">
+                    <button class="btn btn-income" onclick="updateIncome()">Update Income</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Financial Overview Dashboard -->
         <div class="dashboard">
             <div class="card balance-card">
-                <h3>Total Balance</h3>
-                <p class="amount" id="totalBalance">$0.00</p>
+                <h3>Total Income</h3>
+                <p class="amount" id="totalBalance">₹0.00</p>
             </div>
             <div class="card expense-card">
                 <h3>Total Expenses</h3>
-                <p class="amount" id="totalExpenses">$0.00</p>
+                <p class="amount" id="totalExpenses">₹0.00</p>
             </div>
             <div class="card savings-card">
                 <h3>Total Savings</h3>
-                <p class="amount" id="totalSavings">$0.00</p>
+                <p class="amount" id="totalSavings">₹0.00</p>
             </div>
             <div class="card net-card">
-                <h3>Net Balance</h3>
-                <p class="amount" id="netBalance">$0.00</p>
+                <h3>Remaining Balance</h3>
+                <p class="amount" id="netBalance">₹0.00</p>
             </div>
         </div>
 
@@ -49,7 +60,7 @@
                         <input type="text" id="expenseDescription" placeholder="e.g., Groceries" required>
                     </div>
                     <div class="form-group">
-                        <label for="expenseAmount">Amount ($)</label>
+                        <label for="expenseAmount">Amount (₹)</label>
                         <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" required>
                     </div>
                     <div class="form-group">
@@ -89,7 +100,7 @@
                         <input type="text" id="savingsDescription" placeholder="e.g., Monthly Savings, Bonus" required>
                     </div>
                     <div class="form-group">
-                        <label for="savingsAmount">Amount ($)</label>
+                        <label for="savingsAmount">Amount (₹)</label>
                         <input type="number" id="savingsAmount" step="0.01" placeholder="0.00" required>
                     </div>
                     <div class="form-group">
