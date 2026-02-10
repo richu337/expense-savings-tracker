@@ -33,7 +33,7 @@ document.getElementById('expenseForm').addEventListener('submit', async (e) => {
         created_at: new Date().toISOString()
     };
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('expenses')
         .insert([expense]);
     
@@ -60,7 +60,7 @@ document.getElementById('savingsForm').addEventListener('submit', async (e) => {
         created_at: new Date().toISOString()
     };
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('savings')
         .insert([savings]);
     
@@ -78,7 +78,7 @@ document.getElementById('savingsForm').addEventListener('submit', async (e) => {
 
 // Load Expenses
 async function loadExpenses() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('expenses')
         .select('*')
         .order('date', { ascending: false });
@@ -111,7 +111,7 @@ async function loadExpenses() {
 
 // Load Savings
 async function loadSavings() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('savings')
         .select('*')
         .order('date', { ascending: false });
@@ -145,14 +145,14 @@ async function loadSavings() {
 // Update Dashboard
 async function updateDashboard() {
     // Get total expenses
-    const { data: expenses } = await supabase
+    const { data: expenses } = await supabaseClient
         .from('expenses')
         .select('amount');
     
     const totalExpenses = expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
     
     // Get total savings
-    const { data: savings } = await supabase
+    const { data: savings } = await supabaseClient
         .from('savings')
         .select('amount');
     
@@ -174,7 +174,7 @@ async function updateDashboard() {
 async function deleteExpense(id) {
     if (!confirm('Are you sure you want to delete this expense?')) return;
     
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('expenses')
         .delete()
         .eq('id', id);
@@ -192,7 +192,7 @@ async function deleteExpense(id) {
 async function deleteSavings(id) {
     if (!confirm('Are you sure you want to delete this savings entry?')) return;
     
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('savings')
         .delete()
         .eq('id', id);
